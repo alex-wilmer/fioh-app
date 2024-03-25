@@ -48,7 +48,7 @@ export default function App() {
     fileReader.readAsDataURL(file);
   }
 
-  async function uploadToImgur({ caption }) {
+  async function uploadToImgur({ caption }: { caption: string }) {
     if (!dataUrl) throw Error("dataurl non-existant or malformed");
 
     const format = (s: string | ArrayBuffer) => {
