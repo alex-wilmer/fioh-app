@@ -79,8 +79,11 @@ export default function App() {
 
     const { data } = await response.json();
 
+    console.log({ data });
+
     if (data.link) {
-      setLinkToRemoveBG(data);
+      setLinkToRemoveBG(data.link);
+      setImageUrl(data.link);
     }
 
     // if (data.link) {
@@ -96,10 +99,6 @@ export default function App() {
   }
 
   async function load(image) {
-    // setIsRunning(true);
-    // resetTimer();
-    setImageUrl(image);
-
     console.log("wat");
 
     const imageBlob = await removeBackground(image);
