@@ -98,6 +98,8 @@ export default function App() {
     // }
   }
 
+  // todo fix type - i think it's a url
+  // @ts-ignore
   async function load(image) {
     console.log("wat");
 
