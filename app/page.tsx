@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import removeBackground from "@imgly/background-removal";
 import styles from "./page.module.css";
 import UploadImage from "~/components/UploadImage";
 
@@ -9,6 +10,10 @@ const CLIENT_ID = "0811fdfd7496d7e";
 export default function App() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [viewingImage, setViewingImage] = useState();
+
+  const [linkToRemoveBG, setLinkToRemoveBG] = useState(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
   const [dataUrl, setDataUrl] = useState<
     string | ArrayBuffer | null | undefined
   >(null);
@@ -16,7 +21,6 @@ export default function App() {
     width: number;
     height: number;
   } | null>(null);
-  const [youtubeLink, setYoutubeLink] = useState("");
   const [loading, setLoading] = useState(false);
 
   // todo: figure out type
@@ -73,31 +77,66 @@ export default function App() {
       }),
     });
 
-    console.log({ response });
-
     const { data } = await response.json();
 
     if (data.link) {
-      setDataUrl(null);
-
-      // saveToDb({
-      //   link: data.link,
-      //   width: data.width,
-      //   height: data.height,
-      //   caption,
-      // });
+      setLinkToRemoveBG(data);
     }
+
+    // if (data.link) {
+    // setDataUrl(null);
+
+    // saveToDb({
+    //   link: data.link,
+    //   width: data.width,
+    //   height: data.height,
+    //   caption,
+    // });
+    // }
+  }
+
+  async function load(image) {
+    // setIsRunning(true);
+    // resetTimer();
+    setImageUrl(image);
+
+    console.log("wat");
+
+    const imageBlob = await removeBackground(image);
+    //   debug: true,
+    //   progress: (key, current, total) => {
+    //     const [type, subtype] = key.split(":");
+    //     setCaption(
+    //       `${type} ${subtype} ${((current / total) * 100).toFixed(0)}%`
+    //     );
+    //   },
+    // });
+
+    const url = URL.createObjectURL(imageBlob);
+
+    setImageUrl(url);
+    // setIsRunning(false);
+    // stopTimer();
   }
 
   return (
     <main className={styles.main}>
-      <UploadImage
-        dataUrl={dataUrl}
-        imageSize={imageSize}
-        uploadFile={uploadFile}
-        uploadToImgur={uploadToImgur}
-        clearDataUrl={() => setDataUrl(null)}
-      />
+      {!!linkToRemoveBG && (
+        <div>
+          <img src={imageUrl as string} className="App-logo" alt="logo" />
+          <button onClick={() => load(linkToRemoveBG)}>Click me</button>
+        </div>
+      )}
+      {!linkToRemoveBG && (
+        <UploadImage
+          dataUrl={dataUrl}
+          imageSize={imageSize}
+          uploadFile={uploadFile}
+          uploadToImgur={uploadToImgur}
+          clearDataUrl={() => setDataUrl(null)}
+        />
+      )}
+      {}
     </main>
   );
 }
