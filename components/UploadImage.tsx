@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import { Button } from "@mui/material";
 
@@ -12,7 +12,7 @@ export default function UploadImage({
   clearDataUrl?: Function;
   dataUrl?: string | ArrayBuffer | null;
   imageSize: { width: number; height: number } | null;
-  uploadFile: Function;
+  uploadFile: React.ChangeEventHandler<HTMLInputElement>;
   uploadToImgur?: Function;
 }) {
   const [caption, setCaption] = useState("");
