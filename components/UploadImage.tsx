@@ -3,11 +3,17 @@ import Box from "@mui/material/Box";
 import { Button } from "@mui/material";
 
 export default function UploadImage({
-  clearDataUrl,
+  clearDataUrl = () => {},
   dataUrl,
   imageSize,
   uploadFile,
-  uploadToImgur,
+  uploadToImgur = () => {},
+}: {
+  clearDataUrl?: Function;
+  dataUrl?: string | ArrayBuffer | null;
+  imageSize: { width: number; height: number } | null;
+  uploadFile: Function;
+  uploadToImgur?: Function;
 }) {
   const [caption, setCaption] = useState("");
   return (
@@ -49,15 +55,19 @@ export default function UploadImage({
             justifyContent: `center`,
           }}
         >
-          <div>
-            <img // eslint-disable-line
-              alt="dataUrl"
-              src={dataUrl}
-              style={{
-                maxWidth: `40rem`,
-              }}
-            />
-          </div>
+          {!!dataUrl && (
+            <div>
+              <img // eslint-disable-line
+                alt="dataUrl"
+                // todo this type is fucked
+                // @ts-ignore
+                src={dataUrl}
+                style={{
+                  maxWidth: `40rem`,
+                }}
+              />
+            </div>
+          )}
           <div
             style={{
               margin: `1rem 0`,
@@ -68,7 +78,7 @@ export default function UploadImage({
                 marginBottom: `1rem`,
               }}
             >
-              {imageSize.width}px - {imageSize.height}px
+              {imageSize?.width}px - {imageSize?.height}px
             </div>
 
             <label
@@ -85,7 +95,7 @@ export default function UploadImage({
               <textarea
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
-                rows="10"
+                rows={10}
                 style={{
                   marginBottom: `1rem`,
                   height: `8rem`,
@@ -93,9 +103,9 @@ export default function UploadImage({
               />
 
               <Box>
-                <Button onClick={clearDataUrl}>Cancel</Button>
+                <Button onClick={() => clearDataUrl(null)}>Cancel</Button>
                 <Button
-                  onClick={() => uploadToImgur({ caption })}
+                  onClick={() => uploadToImgur({ caption: caption || "" })}
                   style={{
                     marginLeft: `3rem`,
                   }}

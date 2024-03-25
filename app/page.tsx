@@ -13,7 +13,7 @@ export default function App() {
     string | ArrayBuffer | null | undefined
   >(null);
   const [imageSize, setImageSize] = useState<{
-    width: Number;
+    width: number;
     height: number;
   } | null>(null);
   const [youtubeLink, setYoutubeLink] = useState("");
@@ -60,7 +60,7 @@ export default function App() {
 
     setLoading(true);
 
-    const response = await fetch(`http://api.imgur.com/3/image`, {
+    const response = await fetch(`https://api.imgur.com/3/image`, {
       method: `POST`,
       headers: {
         Authorization: `Client-ID ${CLIENT_ID}`,
