@@ -1,6 +1,16 @@
 import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import { Button } from "@mui/material";
+import ReactCrop, { type Crop } from "react-image-crop";
+
+function CropDemo({ src }) {
+  const [crop, setCrop] = useState<Crop>();
+  return (
+    <ReactCrop crop={crop} onChange={(c) => setCrop(c)}>
+      <img src={src} />
+    </ReactCrop>
+  );
+}
 
 export default function UploadImage({
   clearDataUrl = () => {},
@@ -55,19 +65,17 @@ export default function UploadImage({
             justifyContent: `center`,
           }}
         >
-          {!!dataUrl && (
-            <div>
-              <img // eslint-disable-line
-                alt="dataUrl"
-                // todo this type is fucked
-                // @ts-ignore
-                src={dataUrl}
-                style={{
-                  maxWidth: `40rem`,
-                }}
-              />
-            </div>
-          )}
+          <div>
+            <img // eslint-disable-line
+              alt="dataUrl"
+              // todo this type is fucked
+              // @ts-ignore
+              src={dataUrl}
+              style={{
+                maxWidth: `40rem`,
+              }}
+            />
+          </div>
           <div
             style={{
               margin: `1rem 0`,

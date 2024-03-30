@@ -87,12 +87,29 @@ body {
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  height: 100vh;
+  background: url("/bg.png");
+  background-position: top;
+  background-repeat: no-repeat;
+  background-color: #1f2b29;
+  background-size: cover;
+}
+
+.App {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.App.modal {
+  background: #000000e8;
+}
+
+.crop-container {
+  padding: 20px;
+  max-width: 850px;
 }
 
 a {
