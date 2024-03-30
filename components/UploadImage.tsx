@@ -1,16 +1,6 @@
 import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import { Button } from "@mui/material";
-import ReactCrop, { type Crop } from "react-image-crop";
-
-function CropDemo({ src }) {
-  const [crop, setCrop] = useState<Crop>();
-  return (
-    <ReactCrop crop={crop} onChange={(c) => setCrop(c)}>
-      <img src={src} />
-    </ReactCrop>
-  );
-}
 
 export default function UploadImage({
   clearDataUrl = () => {},
