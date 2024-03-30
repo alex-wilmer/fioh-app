@@ -55,11 +55,9 @@ export default function App() {
   const [removingBG, setRemovingBG] = useState(false);
 
   const fileUpload = useRef(null);
-  const uploadProfilePic = (e) => {
-    console.log(e);
-  };
 
   const handleUpload = () => {
+    // @ts-ignore
     fileUpload.current.click();
   };
 
