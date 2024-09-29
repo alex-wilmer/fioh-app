@@ -1,19 +1,21 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useState, useRef } from "react";
-import Image from "next/image";
 import ReactCrop, {
   centerCrop,
   makeAspectCrop,
   Crop,
   PixelCrop,
-  convertToPixelCrop,
 } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
-import { LinearProgress, Button } from "@mui/material";
+import { Box, LinearProgress, Button } from "@mui/material";
 import removeBackground from "@imgly/background-removal";
 import { canvasPreview } from "./canvasPreview";
 import { useDebounceEffect } from "./useDebounceEffect";
+
+import { generateReactHelpers } from "@uploadthing/react";
+import type { OurFileRouter } from "~/app/api/uploadthing/core";
 
 // This is to demonstate how to make and center a % aspect crop
 // which is a bit trickier so we use some helper functions.
@@ -54,7 +56,26 @@ export default function App() {
 
   const [removingBG, setRemovingBG] = useState(false);
 
+  const [file, setFile] = useState<File | null>(null);
+
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+
   const fileUpload = useRef(null);
+
+  const { useUploadThing, uploadFiles } = generateReactHelpers<OurFileRouter>();
+
+  const { startUpload, routeConfig } = useUploadThing("imageUploader", {
+    onClientUploadComplete: () => {
+      // alert("uploaded successfully!");
+      setUploadSuccess(true);
+    },
+    onUploadError: () => {
+      // alert("error occurred while uploading");
+    },
+    onUploadBegin: ({ file }) => {
+      console.log("upload has begun for", file);
+    },
+  });
 
   const handleUpload = () => {
     // @ts-ignore
@@ -79,7 +100,7 @@ export default function App() {
   }
 
   async function onDownloadCropClick() {
-    setRemovingBG(true);
+    // setRemovingBG(true);
 
     const image = imgRef.current;
     const previewCanvas = previewCanvasRef.current;
@@ -123,7 +144,7 @@ export default function App() {
       type: "image/png",
     });
 
-    blob = await removeBackground(blob);
+    // blob = await removeBackground(blob);
 
     if (blobUrlRef.current) {
       URL.revokeObjectURL(blobUrlRef.current);
@@ -134,12 +155,9 @@ export default function App() {
 
     setImageUrl(url);
 
-    setRemovingBG(false);
+    const file = new File([blob], "image.png", { type: blob.type });
 
-    // if (hiddenAnchorRef.current) {
-    //   hiddenAnchorRef.current.href = blobUrlRef.current;
-    //   hiddenAnchorRef.current.click();
-    // }
+    setFile(file);
   }
 
   useDebounceEffect(
@@ -226,11 +244,27 @@ export default function App() {
       {/* </div> */}
       {imageUrl && (
         <div className="crop-container">
-          <h3>Next stop, add to triangle -- choo choo!</h3>
-          <br />
-          <h4>Refresh the page to start again</h4>
-          <br />
-          <img src={imageUrl as string} className="App-logo" alt="logo" />
+          {uploadSuccess && (
+            <Box>Thank you! Your picture has been sent to Stefano!</Box>
+          )}
+
+          {!uploadSuccess && (
+            <>
+              <img src={imageUrl as string} className="App-logo" alt="logo" />
+              <Box
+                sx={{ mt: "15px", display: "flex", justifyContent: "center" }}
+              >
+                <Button
+                  onClick={() => {
+                    if (file) startUpload([file]);
+                  }}
+                  variant="contained"
+                >
+                  UPLOAD
+                </Button>
+              </Box>
+            </>
+          )}
         </div>
       )}
       {removingBG && (
@@ -278,12 +312,8 @@ export default function App() {
           />
           <div>
             <Button onClick={onDownloadCropClick} variant="contained">
-              Submit
+              Crop
             </Button>
-            {/* <div style={{ fontSize: 12, color: "#666" }}>
-              If you get a security error when downloading try opening the
-              Preview in a new tab (icon near top right).
-            </div> */}
             <a
               href="#hidden"
               ref={hiddenAnchorRef}
