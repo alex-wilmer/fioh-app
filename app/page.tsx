@@ -73,9 +73,8 @@ export default function App() {
     onUploadError: () => {
       // alert("error occurred while uploading");
     },
-    onUploadBegin: ({ file }) => {
+    onUploadBegin: () => {
       setRemovingBG(true);
-      console.log("upload has begun for", file);
     },
   });
 
