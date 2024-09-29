@@ -68,11 +68,13 @@ export default function App() {
     onClientUploadComplete: () => {
       // alert("uploaded successfully!");
       setUploadSuccess(true);
+      setRemovingBG(false);
     },
     onUploadError: () => {
       // alert("error occurred while uploading");
     },
     onUploadBegin: ({ file }) => {
+      setRemovingBG(true);
       console.log("upload has begun for", file);
     },
   });
@@ -270,9 +272,6 @@ export default function App() {
       {removingBG && (
         <div style={{ position: "absolute", top: 0, width: "100%" }}>
           <LinearProgress />
-          <div style={{ padding: "20px" }}>
-            Removing background... hang tight...
-          </div>
         </div>
       )}
       {!!imgSrc && !imageUrl && (
