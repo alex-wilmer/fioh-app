@@ -9,7 +9,7 @@ import ReactCrop, {
   PixelCrop,
 } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
-import { Box, LinearProgress, Button } from "@mui/material";
+import { Box, LinearProgress, Button, TextField } from "@mui/material";
 import removeBackground from "@imgly/background-removal";
 import { canvasPreview } from "./canvasPreview";
 import { useDebounceEffect } from "./useDebounceEffect";
@@ -63,6 +63,8 @@ export default function App() {
   const fileUpload = useRef(null);
 
   const { useUploadThing, uploadFiles } = generateReactHelpers<OurFileRouter>();
+
+  const [email, setEmail] = useState("");
 
   const { startUpload, routeConfig } = useUploadThing("imageUploader", {
     onClientUploadComplete: () => {
@@ -156,7 +158,11 @@ export default function App() {
 
     setImageUrl(url);
 
-    const file = new File([blob], "image.png", { type: blob.type });
+    const file = new File([blob], "temp", {
+      type: blob.type,
+    });
+
+    console.log(file);
 
     setFile(file);
   }
@@ -246,25 +252,53 @@ export default function App() {
       {imageUrl && (
         <div className="crop-container">
           {uploadSuccess && (
-            <Box>Thank you! Your picture has been sent to Stefano!</Box>
+            <Box>Thank you for sending your picture to FIOH!</Box>
           )}
 
           {!uploadSuccess && (
-            <>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: "15px" }}>
               <img src={imageUrl as string} className="App-logo" alt="logo" />
+
+              <Box>Please enter your email! (optional)</Box>
+
+              <TextField
+                className="email-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Your email"
+                sx={{
+                  border: "1px solid #fff",
+                  mx: "15px",
+                  "& .MuiInputBase-input": {
+                    color: "#fff",
+                  },
+                }}
+              />
+
               <Box
                 sx={{ mt: "15px", display: "flex", justifyContent: "center" }}
               >
                 <Button
                   onClick={() => {
-                    if (file) startUpload([file]);
+                    if (file) {
+                      const currentDate = new Date();
+                      const formattedDate = `${currentDate.getDate()}-${currentDate.getHours()}-${currentDate.getMinutes()}`;
+                      const myNewFile = new File(
+                        [file],
+                        `${email || "image"}-${formattedDate}.png`,
+                        {
+                          type: file.type,
+                        }
+                      );
+                      startUpload([myNewFile]);
+                    }
                   }}
                   variant="contained"
                 >
                   UPLOAD
                 </Button>
               </Box>
-            </>
+            </Box>
           )}
         </div>
       )}

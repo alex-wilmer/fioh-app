@@ -122,3 +122,12 @@ a {
     color-scheme: dark;
   }
 }
+
+.email-input {
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.email-input::placeholder {
+  color: #fff;
+}
