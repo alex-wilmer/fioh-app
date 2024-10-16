@@ -103,59 +103,82 @@ export default function App() {
   }
 
   async function onDownloadCropClick() {
-    // setRemovingBG(true);
-
     const image = imgRef.current;
     const previewCanvas = previewCanvasRef.current;
+
     if (!image || !previewCanvas || !completedCrop) {
       setRemovingBG(false);
       throw new Error("Crop canvas does not exist");
     }
 
-    // This will size relative to the uploaded image
-    // size. If you want to size according to what they
-    // are looking at on screen, remove scaleX + scaleY
+    // Ensure cropping is done based on the natural size of the image
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
 
-    const offscreen = new OffscreenCanvas(
-      // completedCrop.width * scaleX,
-      // completedCrop.height * scaleY
-      completedCrop.width,
-      completedCrop.height
-    );
+    const maxWidth = 1200; // Define a maximum width for the image
+    const maxHeight = 1200; // Define a maximum height for the image
+
+    let cropWidth = completedCrop.width * scaleX;
+    let cropHeight = completedCrop.height * scaleY;
+
+    // Scale down if the cropped dimensions exceed the max dimensions
+    if (cropWidth > maxWidth || cropHeight > maxHeight) {
+      const aspectRatio = cropWidth / cropHeight;
+
+      if (cropWidth > maxWidth) {
+        cropWidth = maxWidth;
+        cropHeight = maxWidth / aspectRatio;
+      }
+
+      if (cropHeight > maxHeight) {
+        cropHeight = maxHeight;
+        cropWidth = maxHeight * aspectRatio;
+      }
+    }
+
+    const offscreen = new OffscreenCanvas(cropWidth, cropHeight);
     const ctx = offscreen.getContext("2d");
+
     if (!ctx) {
       setRemovingBG(false);
       throw new Error("No 2d context");
     }
 
+    // ctx.drawImage(
+    //   image, // Use the image itself, not the preview canvas
+    //   completedCrop.x * scaleX, // Crop area x-coordinate
+    //   completedCrop.y * scaleY, // Crop area y-coordinate
+    //   cropWidth, // Scaled width
+    //   cropHeight, // Scaled height
+    //   0, // Destination x-coordinate
+    //   0, // Destination y-coordinate
+    //   cropWidth, // Final cropped width
+    //   cropHeight // Final cropped height
+    // );
+
     ctx.drawImage(
-      previewCanvas,
+      image,
+      completedCrop.x * scaleX,
+      completedCrop.y * scaleY,
+      completedCrop.width * scaleX,
+      completedCrop.height * scaleY,
       0,
       0,
-      previewCanvas.width,
-      previewCanvas.height,
-      0,
-      0,
-      offscreen.width,
-      offscreen.height
+      cropWidth,
+      cropHeight
     );
-    // You might want { type: "image/jpeg", quality: <0 to 1> } to
-    // reduce image size
+
     let blob = await offscreen.convertToBlob({
-      type: "image/png",
+      type: "image/png", // You can switch to "image/png" if needed
     });
 
-    // blob = await removeBackground(blob);
+    console.log(`Blob size: ${blob.size} bytes`);
 
     if (blobUrlRef.current) {
       URL.revokeObjectURL(blobUrlRef.current);
     }
-    // blobUrlRef.current = URL.createObjectURL(blob);
 
     const url = URL.createObjectURL(blob);
-
     setImageUrl(url);
 
     const file = new File([blob], "temp", {
@@ -163,7 +186,6 @@ export default function App() {
     });
 
     console.log(file);
-
     setFile(file);
   }
 
@@ -256,8 +278,19 @@ export default function App() {
           )}
 
           {!uploadSuccess && (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-              <img src={imageUrl as string} className="App-logo" alt="logo" />
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "15px",
+                alignItems: "center",
+              }}
+            >
+              <img
+                className="cropped-img"
+                src={imageUrl as string}
+                alt="logo"
+              />
 
               <Box>Please enter your email! (optional)</Box>
 
